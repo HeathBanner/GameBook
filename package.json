@@ -3,15 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.4.0",
+    "concurrently": "^4.1.2",
+    "eslint": "^6.3.0",
+    "moment": "^2.24.0",
+    "nodemon": "^1.19.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
+    "react-parallax": "^2.2.0",
+    "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "install": "yarn run install:client && yarn run install:server",
+    "install:client": "cd client && yarn",
+    "install:server": "cd server && yarn",
+    "build": "cd client && yarn build",
+    "start": "node server/server.js",
+    "start:dev": "concurrently -n client,server \"yarn run client:dev\" \"yarn run server:dev\"",
+    "client:dev": "cd client && yarn start",
+    "server:dev": "nodemon server/server.js",
+    "heroku-postbuild": "yarn build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -27,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint-plugin-react-hooks": "^2.0.1"
   }
 }
