@@ -9,7 +9,7 @@ import Fab from '@material-ui/core/Fab';
 
 import Moment from 'moment';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
     root: {
         color: 'black !important',
     },
@@ -55,10 +55,10 @@ const Story = () => {
     const handleStoryPost = () => {
         const userId = auth.user._id;
         const infoId = auth.user.info._id;
-        // const time = Moment();
+        const time = Moment();
         fetch('/api/social/newStory', {
             method: 'POST',
-            body: JSON.stringify({ userId, infoId, story }),
+            body: JSON.stringify({ userId, infoId, story, time }),
             headers: { 'Content-Type': 'application/json' }
         })
             .then(res => res.json())

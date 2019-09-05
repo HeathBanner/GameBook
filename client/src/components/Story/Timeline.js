@@ -59,41 +59,42 @@ function Timeline() {
     const [incomingComment, setIncomingComment] = useState(false);
 
 
-    function getStories() {
+    const getStories = () => {
         fetch('/api/social/friendStories', {
             method: 'POST',
             body: JSON.stringify({id: auth.user.info}),
             headers: {'Content-Type': 'application/json'}
-        }).then(res => res.json())
-        .then((result) => {
-            var storyStorage = result;
-            var storyIDList = {};
-            auth.user.info.authored_stories.map((story, index) => {
-                storyIDList[story._id] = false
-                storyStorage.push(story);
-            });
-            storyStorage.sort((a, b) => {
-                return new Date(a.time) - new Date(b.time);
-            })
-            setFriendStories(storyStorage);
-            setStoryIDs(storyIDList)
         })
+            .then(res => res.json())
+            .then((result) => {
+                var storyStorage = result;
+                var storyIDList = {};
+                auth.user.info.authored_stories.map((story, index) => {
+                    storyIDList[story._id] = false
+                    storyStorage.push(story);
+                });
+                storyStorage.sort((a, b) => {
+                    return new Date(a.time) - new Date(b.time);
+                })
+                setFriendStories(storyStorage);
+                setStoryIDs(storyIDList)
+            })
     }
 
-    useEffect(() => {
-        if((auth.isLoaded)&&(auth.newStory)) {
-            getStories();
-            auth.updateLoaded(auth.user, false);
-            auth.updateNewStory(auth.user, false);
-        }
-        if((!onLoad) && (auth.user)){
-            getStories();
-            setOnLoad(true);
-        }
-        if(incomingComment) {
+    // useEffect(() => {
+    //     if((auth.isLoaded)&&(auth.newStory)) {
+    //         getStories();
+    //         auth.updateLoaded(auth.user, false);
+    //         auth.updateNewStory(auth.user, false);
+    //     }
+    //     if((!onLoad) && (auth.user)){
+    //         getStories();
+    //         setOnLoad(true);
+    //     }
+    //     if(incomingComment) {
             
-        }
-    })
+    //     }
+    // })
 
     function handleDelete(id) {
         console.log(id);

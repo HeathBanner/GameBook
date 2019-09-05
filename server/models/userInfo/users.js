@@ -8,6 +8,16 @@ const UserSchema = new Schema({
         trim: true,
         required: true,
     },
+    email: {
+        type: String,
+        trim: true,
+        required: true,
+    },
+    password: {
+        type: String,
+        trim: true,
+        required: true,
+    },
     type: {
         type: String,
     },
@@ -15,27 +25,8 @@ const UserSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Info',
     },
-});
+}, { collection: 'users' });
 
-class newUser {
-    constructor({
-        id,
-        username,
-        email,
-        password,
-    }) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-    comparePassword(challenge) {
-        return this.password === challenge;
-    }
-}
-
-UserSchema.loadClass(newUser);
 const Users = mongoose.model('Users', UserSchema, 'users');
 
 module.exports = Users;

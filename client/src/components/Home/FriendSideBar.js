@@ -10,17 +10,13 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        // overflow: 'hidden',
         backgroundColor: theme.palette.background.paper,
     },
     gridList: {
         width: '100%',
-        // height: 450,
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        // overflow: 'hidden',
-        // backgroundColor: theme.palette.background.paper,
         margin: '0 auto',
     },
     subheader: {
@@ -44,56 +40,56 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-function Friends(props) {
+const Friends = (props) => {
 
     const classes = useStyles();
 
     const [friendList, setFriendList] = useState([]);
     const [loaded, setLoaded] = useState(false);
 
-    useEffect(() => {
-        if((!loaded) && (props.user)) {
-            fetch('/api/social/getFriends', {
-                method: 'POST',
-                body: JSON.stringify({id: props.user._id}),
-                headers: {'Content-Type': 'application/json'}
-            }).then(res => res.json())
-            .then((result) => {
-                setFriendList([...result])
-                setLoaded(true);
-            });
-        };
-    });
+    // useEffect(() => {
+    //     if((!loaded) && (props.user)) {
+    //         fetch('/api/social/getFriends', {
+    //             method: 'POST',
+    //             body: JSON.stringify({id: props.user._id}),
+    //             headers: {'Content-Type': 'application/json'}
+    //         }).then(res => res.json())
+    //         .then((result) => {
+    //             setFriendList([...result])
+    //             setLoaded(true);
+    //         });
+    //     };
+    // }, []);
 
-    function renderFriends() {
+    // const renderFriends = () => {
         
-        if(loaded){
-            return (
-                friendList.map((friend, index) => {
-                    return (
-                        <GridListTile cols={1.5}  className={classes.tile} style={{backgroundImage: `url(${friend.info.skyline})`}} key={friend._id} >
-                            <Link to={`/social/${friend.username}`} params={friend}>
-                                <GridListTileBar 
-                                    title={friend.username}
-                                    actionIcon={
-                                        <IconButton className={classes.icon}>
-                                            <Icon>exit_to_app</Icon>
-                                        </IconButton>
-                                    }
-                                />
-                            </Link>
-                        </GridListTile>
-                    )
-                })  
-            );
-        } else {
-            return (
-                <Typography variant="h3" align="center" color="textSecondary" >
-                    Sorry, no photos {`¯|_(ツ)_/¯`}
-                </Typography>
-            );
-        }
-    }
+    //     if(loaded){
+    //         return (
+    //             friendList.map((friend, index) => {
+    //                 return (
+    //                     <GridListTile cols={1.5}  className={classes.tile} style={{backgroundImage: `url(${friend.info.skyline})`}} key={friend._id} >
+    //                         <Link to={`/social/${friend.username}`} params={friend}>
+    //                             <GridListTileBar 
+    //                                 title={friend.username}
+    //                                 actionIcon={
+    //                                     <IconButton className={classes.icon}>
+    //                                         <Icon>exit_to_app</Icon>
+    //                                     </IconButton>
+    //                                 }
+    //                             />
+    //                         </Link>
+    //                     </GridListTile>
+    //                 )
+    //             })  
+    //         );
+    //     } else {
+    //         return (
+    //             <Typography variant="h3" align="center" color="textSecondary" >
+    //                 Sorry, no photos {`¯|_(ツ)_/¯`}
+    //             </Typography>
+    //         );
+    //     }
+    // }
 
     return (
         <div className="col-12">
@@ -103,7 +99,7 @@ function Friends(props) {
                             <Typography variant="h4" className={classes.subheader}>Friends</Typography>
                         </ListSubheader>
                     </GridListTile>
-                    {renderFriends()}
+                    {/* {renderFriends()} */}
                 </GridList>
         </div>
     );

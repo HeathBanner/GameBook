@@ -1,134 +1,189 @@
-import React, { Fragment, useContext } from 'react';
-import FormControl from '@material-ui/core/FormControl';
-import { makeStyles } from '@material-ui/core/styles';
-import Fab from '@material-ui/core/Fab';
-import { InputLabel, Input } from '@material-ui/core';
+import React, { useContext, useState } from 'react';
+import { Redirect, Link } from 'react-router-dom';
 
-import AuthContext from '../../context/AuthContext';
-import { Redirect } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+    TextField,
+    Button,
+    Typography,
+    Paper,
+} from '@material-ui/core';
+
+import { AuthContext } from '../../contexts/AuthContext';
+
+import SuccessNotification from '../Notifications/SuccessNotification';
+import ErrorNotification from '../Notifications/ErrorNotification';
+import WarningNotification from '../Notifications/WarningNotification';
+
+const initInfo = {
+    email: '',
+    password: '',
+};
+
+const initNotifications = {
+    open: false,
+    message: '',
+};
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        marginTop: '40px',
-        color: 'black !important',
-        width: '60% !important',
+    paper: {
+        padding: 15,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'wrap',
     },
-    label: {
-        color: 'white !important',
+    inputs: {
+        width: '100%',
+        marginTop: 20,
     },
-    hidden: {
-        transform: 'translate(0, 1.5px) scale(0.75) !important',
-        transformOrigin: 'top left !important',
-        color: 'white !important',
-    },
-    underline: {
-        '&:before': {
-            borderBottom: '1px solid rgb(0, 0, 0) !important',
-            },
-        '&:after': {
-            borderBottom: '2px solid rgb(129, 0, 206) !important',
+    button: {
+        width: '100%',
+        marginTop: 20,
+        padding: 15,
+        background: 'rgb(0, 0, 0, 0.1)',
+        transition: 'all 0.4s ease',
+        '&:hover': {
+            background: 'rgb(0, 0, 0, 0.3)',
+            transform: 'scale(1.03)',
         },
-        '&:hover:before': {
-            borderBottom: '2px solid rgb(0, 0, 0) !important',
-        }
     },
-    input: {
-        backgroundColor: 'transparent !important',
+    signup: {
+        width: '100%',
+        marginTop: 20,
+        padding: 15,
+        background: 'rgb(3, 145, 126, 0.1)',
+        transition: 'all 0.4s ease',
+        '&:hover': {
+            background: 'rgb(0, 0, 0, 0.3)',
+            transform: 'scale(1.03)',
+        },
     },
-    postStory: {
-        display: 'block',
-        margin: '20px auto',
-        padding: '5px 10px',
-        background: 'rgb(129, 0, 206)'
-    },
-    form: {
-        // display: 'flex',
-        // flexWrap: 'wrap',
-        // flexDirection: 'row',
-        width: '50%',
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        background: 'rgb(0, 0, 0, 0.08)',
-        padding: '20px',
-    },
-}))
+}));
 
+const LoginForm = () => {
 
-function LoginForm() {
-
-    const [email, setEmail] = React.useState('');
-    const [emailFocus, setEmailFocus] = React.useState(false);
-    const [password, setPassword] = React.useState('');
-    const [passwordFocus, setPasswordFocus] = React.useState(false);
-    const [success, setSuccess] = React.useState(false);
-
-
-    const context = useContext(AuthContext);
-
+    const auth = useContext(AuthContext);
     const classes = useStyles();
 
-    function handleInputChange(e) {
-        const { name, value } = e.target;
-        if(name === 'email'){return setEmail(value)}
-        if(name === 'password'){return setPassword(value)}
-    }
+    const [info, setInfo] = useState({ ...initInfo });
+    const [success, setSuccess] = useState({ ...initNotifications });
+    const [error, setError] = useState({ ...initNotifications });
+    const [warning, setWarning] = useState({ ...initNotifications });
+    const [toLogin, setToLogin] = useState(false);
 
-    function handleOnSubmit(e) {
-        e.preventDefault();
-        console.log(context)
+    const closeError = () => { setError({ ...initNotifications }); };
+    const closeSuccess = () => { setSuccess({ ...initNotifications }); };
+    const closeWarning = () => { setWarning({ ...initNotifications }); };
+
+    const preSubmit = () => {
+        switch (true) {
+            case info.email.length < 2:
+                return setWarning({
+                    open: true,
+                    message: 'Incorrect email!',
+                });
+            case info.password.length < 6:
+                return setWarning({
+                    open: true,
+                    message: 'Incorrect password!',
+                });
+            default:
+                return handleSubmit();
+        }
+    };
+
+    const handleSubmit = () => {
+        const { email, password } = info;
         fetch('/api/users/login', {
             method: 'POST',
-            body: JSON.stringify({email: email, password: password}),
-            headers: {'Content-Type': 'application/json'}
+            body: JSON.stringify({ email, password }),
+            headers: { 'Content-Type': 'application/json' },
         })
-        .then(res => res.json())
-        .then(({ user, token }) => {
-            console.log(user, token);
-            console.log(context)
-            context.onLogin(user, token);
-            console.log('past login')
-            setSuccess(true);
-        });
-    }
+            .then(res => res.json())
+            .then((result) => {
+                if (result.error) {
+                    return setError({ open: true, message: result.message });
+                }
+                auth.handleLogin(result.user, result.token);
+                setInfo({ ...initInfo });
+                setSuccess({
+                    open: true,
+                    message: 'Login Successful!',
+                });
+            })
+            .catch(() => { setError({ open: true, message: 'Something went wrong!' }); });
+        };
 
-    if(success){return <Redirect to={'/social'} />}
+    const handleRedirect = () => { setToLogin(true); };
 
+    if (toLogin) { return <Redirect to="/" />; }
     return (
-        <Fragment>
-            <form className={classes.form} onSubmit={handleOnSubmit}>
-                <FormControl className={classes.root}>
-                    <InputLabel className={email ? classes.hidden : classes.label}>Email</InputLabel>
-                    <Input 
-                        classes={{underline: classes.underline}}
-                        name='email'
-                        value={email}
-                        type="email"
-                        onChange={handleInputChange}
-                    />
-                </FormControl>
-                <FormControl className={classes.root}>
-                    <InputLabel className={password ? classes.hidden : classes.label}>Password</InputLabel>
-                    <Input 
-                        classes={{underline: classes.underline}}
-                        variant="outlined"
-                        name='password'
-                        value={password}
-                        type="password"
-                        onChange={handleInputChange}
-                    />
-                </FormControl>
-                <Fab 
-                    size="small" 
-                    variant="extended"
-                    color="primary"
-                    className={classes.postStory} 
-                    type="submit"
-                >Login</Fab>
-            </form>
-        </Fragment>
+        <Paper className={classes.paper}>
+
+            <Typography variant="h4">
+                Login
+            </Typography>
+
+            <TextField
+                className={classes.inputs}
+                type="email"
+                variant="outlined"
+                label="Email"
+                value={info.email}
+                onChange={(e) => setInfo({ ...info, email: e.target.value})}
+            />
+
+            <TextField
+                className={classes.inputs}
+                type="password"
+                variant="outlined"
+                label="Password"
+                value={info.password}
+                onChange={(e) => setInfo({ ...info, password: e.target.value})}
+            />
+
+            <Button
+                className={classes.button}
+                onClick={preSubmit}
+            >
+                <Typography>
+                    Submit
+                </Typography>
+            </Button>
+
+            <Button
+                className={classes.signup}
+            >
+                <Link
+                    style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                    }}
+                    to="/register"
+                >
+                    <Typography>
+                        Sign Up
+                    </Typography>
+                </Link>
+            </Button>
+
+            <SuccessNotification
+                success={success}
+                closeSuccess={closeSuccess}
+                toLogin={handleRedirect}
+            />
+            <ErrorNotification
+                error={error}
+                closeError={closeError}
+            />
+            <WarningNotification
+                warning={warning}
+                closeWarning={closeWarning}
+            />
+
+        </Paper>
     );
-}
+};
 
 export default LoginForm;

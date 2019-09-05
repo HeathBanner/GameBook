@@ -170,10 +170,10 @@ const SocialDrawer = (props) => {
               </IconButton>
 
               <Link className={classes.barTitle} to='/social'>
-                <Avatar alt={value.user ? value.user.username : console.log('NOPE')} src='/imgs/avatar.jpg' />
-                <Typography className={classes.typo} variant="h6">
+                {/* <Avatar alt={value.user ? value.user.username : console.log('NOPE')} src='/imgs/avatar.jpg' /> */}
+                {/* <Typography className={classes.typo} variant="h6">
                   {value.user ? value.user.username : 'Anon'}
-                </Typography>
+                </Typography> */}
               </Link>
 
             </Toolbar>

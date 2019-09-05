@@ -1,73 +1,65 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-import useTheme from '@material-ui/core/styles/useTheme';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
+import { useMediaQuery } from '@material-ui/core';
+
+import TokenStore from '../library/TokenStore';
 
 export const AuthContext = createContext();
 
+const initUser = {
+  info: '',
+  token: TokenStore.getToken(),
+};
+
 export const AuthProvider = (props) => {
 
-  const theme = useTheme();
+  const [user, setUser] = useState({ ...initUser });
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  const xl = useMediaQuery(theme.breakpoints.up('lg'))
-  const lg = useMediaQuery(theme.breakpoints.down('lg'));
-  const md = useMediaQuery(theme.breakpoints.down('md'));
-  const sm = useMediaQuery(theme.breakpoints.down('sm'));
-  const xs = useMediaQuery(theme.breakpoints.down('xs'));
-  
-  const [auth, setAuth] = useState('');
+  // useEffect(() => {
+  //   if (!user.token) { return; }
+  //   fetch('/api/users/verify')
+  //     .then(res => res.json())
+  //     .then((user) => {
+  //       console.log(user);
+  //       return setUser({ ...user });
+  //     })
+  //     .catch(() => { console.log('Oops...'); });
+  // }, [user]);
 
-//   const getWidth = () => {
-//     switch (true) {
-//         case xs:
-//             return console.log('xs');
-//         case sm:
-//             return console.log('sm');
-//         case md:
-//             return console.log('md');
-//         case lg:
-//             return console.log('lg');
-//         default:
-//             return console.log('xl');
-//     }
-// };
+  const handleLogin = (user, authToken) => {
+    TokenStore.setToken(authToken);
+    setUser({
+      info: { ...user },
+      token: authToken,
+    });
+  };
 
-// getWidth();
-
-  useEffect(() => {
-    if (auth) { return }
-    fetch('/api/users/portfolio')
-      .then(res => res.json())
-      .then((user) => {
-        return setAuth({ ...user });
-      })
-      .catch(err => { return });
-  }, [auth]);
+  const handleLogout = () => {
+    TokenStore.clearToken();
+    setUser({ ...initUser });
+    return setLoggedIn(false);
+  };
 
   const getNewStory = () => {
     fetch('/api/users/portfolio')
       .then(res => res.json())
-      .then((user) => {
-        return setAuth({ ...user });
-      })
-      .catch(err => { return });
+      .then((user) => { return setUser({ ...user }); })
+      .catch(() => { console.log('Ooops...'); });
   };
 
   return (
     <AuthContext.Provider
       value={{
-        auth,
+        user,
+        handleLogin,
+        handleLogout,
+        loggedIn,
         getNewStory,
-        xl,
-        lg,
-        md,
-        sm,
-        xs,
       }}
     >
-
       {props.children}
-
     </AuthContext.Provider>
-  )
+  );
 };
