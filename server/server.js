@@ -29,7 +29,7 @@ require('./config/passport')(passport);
 
 const mongoose = require('mongoose');
 
-const MONGOD_URI = 'mongodb://localhost/social';
+const MONGOD_URI = process.env.MONGOD_URI;
 mongoose.connect(MONGOD_URI, { useNewUrlParser: true });
 
 // Passport Middleware
